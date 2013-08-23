@@ -6,10 +6,10 @@ require 'heroku/version'
 Gem::Specification.new do |spec|
   spec.name          = "heroku"
   spec.version       = Heroku::VERSION
-  spec.authors       = ["Ashok Menon"]
-  spec.email         = ["amenon94@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.authors       = ["Rentify"]
+  spec.email         = ["ashok@rentify.com", "dev@rentify.com"]
+  spec.description   = %q{Create, destroy and manage your heroku applications programmatically, using the Heroku Platform API.}
+  spec.summary       = %q{Ruby client for the Heroku Platform API.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
