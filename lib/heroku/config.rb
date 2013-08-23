@@ -1,6 +1,6 @@
 require 'base64'
 
-class Heroku::Config < Struct.new(:email, :api_key)
+class Heroku::Config
   def self.auth_token
     @@auth_token
   end
