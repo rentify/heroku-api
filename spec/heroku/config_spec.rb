@@ -18,7 +18,7 @@ describe Heroku::Config do
     [:email, :api_key].each do |argument|
       context "when no #{argument.to_s} is provided" do
         let(argument) { nil }
-        let(error) { ArgumentError }
+        let(:error) { ArgumentError }
 
         it "should raise an error" do
           expect { described_class.auth_token_update(email, api_key) }.to raise_error(error)
