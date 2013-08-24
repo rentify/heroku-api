@@ -1,7 +1,8 @@
 require 'heroku/config'
-require 'heroku/api/account'
 
 class Heroku::API
+  require 'heroku/api/account'
+
   extend Heroku::Config::ConfigMethods
 
   include Heroku::API::Account
