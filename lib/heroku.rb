@@ -1,5 +1,5 @@
 module Heroku
   require 'heroku/config'
+  require 'heroku/conn'
   require 'heroku/api'
-  require 'heroku/model'
 end
