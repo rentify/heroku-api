@@ -8,15 +8,15 @@ class Heroku::Config
     @@auth_token
   end
 
-  def self.auth_token_update(api_key)
-    raise ArgumentError, "Need an API key" if api_key.nil?
-
-    @@auth_token = Base64.strict_encode64(":#{api_key}\n").strip
+  def self.api_key=(key)
+    raise ArgumentError, "Need an API key" if key.nil?
+    @@auth_token = Base64.strict_encode64(":#{key}\n").strip
+    key
   end
 
   module ConfigMethods
-    def configure(opts = {})
-      Heroku::Config.auth_token_update(opts[:api_key])
+    def configure # yield
+      yield Heroku::Config
     end
   end
 end
