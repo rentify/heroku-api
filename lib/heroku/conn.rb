@@ -51,6 +51,7 @@ private
   def self.headers(additional = nil)
     {
       "Accept"        => 'application/vnd.heroku+json; version=3',
+      "Content-Type"  => 'application/json',
       "Authorization" => Heroku::Config.auth_token,
       "User-Agent"    => Heroku::Config::USER_AGENT
     }.merge(additional || {})
