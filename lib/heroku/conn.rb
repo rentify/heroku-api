@@ -25,15 +25,15 @@ class Heroku::Conn
     req         = _Request.new(end_point, header_hash)
     req.body    = opts[:body]
 
-    check_response(end_point, @https.request(req))
+    check_response("#{method.to_s.upcase} #{end_point}", @https.request(req))
   end
 
 private
 
-  def self.check_response(end_point, res)
+  def self.check_response(key, res)
     case res
-    when Net::HTTPOK          then @response_cache[end_point] = res
-    when Net::HTTPNotModified then @response_cache.fetch(end_point)
+    when Net::HTTPOK          then @response_cache[key] = res
+    when Net::HTTPNotModified then @response_cache.fetch(key)
     when Net::HTTPSuccess     then res
 
     when Net::HTTPBadRequest                   then raise BadRequestError

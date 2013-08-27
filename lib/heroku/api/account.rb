@@ -2,10 +2,17 @@ require 'json'
 require 'heroku/model/account'
 
 module Heroku::API::Account
-  def account(owner = default_owner)
-    res    = Heroku::API::Conn::Get('/account', etag: @@etag)
-    @@etag = res["ETag"]
+  @@etag = nil
 
-    Heroku::Model::Account.new(JSON.parse(res.body))
+  def account
+    res    = Heroku::Conn::Get('/account', etag: @@etag)
+    @@etag = res["ETag"]
+    params = JSON.parse(res.body).merge("owner" => self)
+
+    Heroku::Model::Account.new(params)
+  end
+
+  def update_account(account)
+    Heroku::Conn::Patch("/account", body: account.patchable.to_json)
   end
 end
