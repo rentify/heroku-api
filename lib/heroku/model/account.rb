@@ -1,4 +1,4 @@
-require 'heroku/api/password'
+require 'heroku/api'
 
 class Heroku::Model::Account < Struct.new(
   :owner,
@@ -13,6 +13,7 @@ class Heroku::Model::Account < Struct.new(
 )
 
   include Heroku::API::Password
+  include Heroku::API::RateLimits
 
   def initialize(params = {})
     super(*params.values_at(*members.map(&:to_s)))
