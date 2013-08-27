@@ -1,3 +1,5 @@
+require 'heroku/api/password'
+
 class Heroku::Model::Account < Struct.new(
   :owner,
   :id,
@@ -9,6 +11,8 @@ class Heroku::Model::Account < Struct.new(
   :updated_at,
   :created_at
 )
+
+  include Heroku::API::Password
 
   def initialize(params = {})
     super(*params.values_at(*members.map(&:to_s)))

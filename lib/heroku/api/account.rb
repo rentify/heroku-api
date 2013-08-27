@@ -1,4 +1,6 @@
 require 'json'
+require 'heroku/api'
+require 'heroku/conn'
 require 'heroku/model/account'
 
 module Heroku::API::Account
