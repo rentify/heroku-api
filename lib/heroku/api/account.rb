@@ -14,5 +14,6 @@ module Heroku::API::Account
 
   def update_account(account)
     Heroku::Conn::Patch("/account", body: account.patchable.to_json)
+    account
   end
 end
