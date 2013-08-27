@@ -2,6 +2,14 @@ require 'net/http'
 require 'heroku/config'
 
 class Heroku::Conn
+  BadRequestError      = Class.new(StandardError)
+  UnauthorizedError    = Class.new(StandardError)
+  PaymentRequiredError = Class.new(StandardError)
+  ForbiddenError       = Class.new(StandardError)
+  NotFoundError        = Class.new(StandardError)
+  NotAcceptableError   = Class.new(StandardError)
+  RateLimitError       = Class.new(StandardError)
+
   @https = Net::HTTP.new('api.heroku.com', 443).tap do |https|
     https.use_ssl     = true
     https.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -17,18 +25,26 @@ class Heroku::Conn
     req         = _Request.new(end_point, header_hash)
     req.body    = opts[:body]
 
-    check_response(@https.request(req))
+    check_response(end_point, @https.request(req))
   end
 
 private
 
-  def self.check_response(res)
+  def self.check_response(end_point, res)
     case res
-    when Net::HTTPOK
-      @response_cache[res["ETag"]] = res if res["ETag"]
-      res
-    when Net::HTTPNotModified
-      @response_cache.fetch(res["ETag"])
+    when Net::HTTPOK          then @response_cache[end_point] = res
+    when Net::HTTPNotModified then @response_cache.fetch(end_point)
+    when Net::HTTPSuccess     then res
+
+    when Net::HTTPBadRequest                   then raise BadRequestError
+    when Net::HTTPUnauthorized                 then raise UnauthorizedError
+    when Net::HTTPPaymentRequired              then raise PaymentRequiredError
+    when Net::HTTPForbidden                    then raise ForbiddenError
+    when Net::HTTPNotFound                     then raise NotFoundError
+    when Net::HTTPNotAcceptable                then raise NotAcceptableError
+    when Net::HTTPRequestedRangeNotSatisfiable then raise RangeError
+    else
+      raise RateLimitError if res.code == "429" # Ruby 1.9.3 has no Net::HTTPTooManyRequests class.
     end
   end
 
