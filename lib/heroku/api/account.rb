@@ -6,7 +6,7 @@ module Heroku::API::Account
 
   def account
     @@etag, res = Heroku::Conn::Get('/account', etag: @@etag)
-    Heroku::Model::Account.new(res.merge("owner" => self))
+    Heroku::Model::Account.new(res.merge("parent" => self))
   end
 
   def update_account(account)
