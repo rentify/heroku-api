@@ -19,22 +19,32 @@ class Heroku::Conn
   @response_cache = {}
 
   def self.method_missing(method, end_point, opts = {})
-    _Request    = Net::HTTP.const_get(method.capitalize)
+    _Request = Net::HTTP.const_get(method.capitalize)
 
-    header_hash = headers(opts[:etag] ? { "If-None-Match" => opts[:etag] } : nil)
+    req      = _Request.new(end_point, headers(opts))
+    req.body = opts[:body]
 
-    req         = _Request.new(end_point, header_hash)
-    req.body    = opts[:body]
-
-    check_response("#{method.to_s.upcase} #{end_point}", @https.request(req))
+    check_response(method, end_point, @https.request(req))
   end
 
-private
+  private
 
-  def self.check_response(key, res)
+  def self.check_response(method, end_point, res)
+    key = "#{method.to_s.upcase} #{end_point}"
+
     case res
     when Net::HTTPOK          then @response_cache[key] = [res["ETag"], JSON.parse(res.body)]
     when Net::HTTPNotModified then @response_cache.fetch(key)
+    when Net::HTTPPartialContent
+      if res["Next-Range"]
+        @response_cache[key] = begin
+          list_head       = JSON.parse(res.body)
+          etag, list_tail = self.send(method, end_point, range: res["Next-Range"])
+          [etag, list_tail.unshift(*list_head)]
+        end
+      else
+        @response_cache[key] = [res["ETag"], JSON.parse(res.body)]
+      end
     when Net::HTTPSuccess     then res
 
     when Net::HTTPBadRequest                   then raise BadRequestError
@@ -49,12 +59,25 @@ private
     end
   end
 
-  def self.headers(additional = nil)
+  def self.raise_exception(res)
+    raise res.class::EXCEPTION_CLASS.new("#{status(res.code)}", nil)
+  end
+
+  def self.status(code)
+    Hash[Net::HTTPResponse::CODE_TO_OBJ.map { |k, v| [k, v.to_s] }]
+      .merge({ "429" => "Net::HTTPTooManyRequests" }) # Ruby 1.9.3 shiv
+      .fetch(code, "Net::HTTPUnknownError")
+  end
+
+  def self.headers(opts = {})
     {
       "Accept"        => 'application/vnd.heroku+json; version=3',
       "Content-Type"  => 'application/json',
       "Authorization" => Heroku::Config.auth_token,
       "User-Agent"    => Heroku::Config::USER_AGENT
-    }.merge(additional || {})
+    }.merge({}.tap do |header|
+      header["If-None-Match"] = opts[:etag]  if opts[:etag]
+      header["Range"]         = opts[:range] if opts[:range]
+    end)
   end
 end
