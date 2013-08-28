@@ -1,4 +1,5 @@
 require 'heroku/api'
+require 'heroku/model'
 
 class Heroku::Model::Account < Struct.new(
   :owner,
@@ -12,15 +13,16 @@ class Heroku::Model::Account < Struct.new(
   :created_at
 )
 
+  include Heroku::Model::HashHelpers
   include Heroku::API::Password
   include Heroku::API::RateLimits
 
   def initialize(params = {})
-    super(*params.values_at(*members.map(&:to_s)))
+    super(*struct_init_from_hash(params))
   end
 
   def patchable
-    Hash[[:email, :allow_tracking].map { |k| [k, send(k)] }]
+    sub_struct_as_hash(:email, :allow_tracking)
   end
 
   def save
