@@ -6,7 +6,6 @@ module Heroku::API::Account
 
   def account
     @@etag, res = Heroku::Conn::Get('/account', etag: @@etag)
-    puts @@etag
     Heroku::Model::Account.new(res.merge("owner" => self))
   end
 
