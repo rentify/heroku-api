@@ -19,10 +19,10 @@ class Heroku::Model::App < Struct.new(
   :updated_at
 )
 
-  include Heroku::Model::HashHelpers
+  include Heroku::Model::ModelHelper
 
   def inspect
-    "#<#{self.class.name} id=#{id}, name=#{name}>"
+    "#<#{self.class.name} #{identifier}>"
   end
 
   def initialize(params = {})
@@ -33,7 +33,7 @@ class Heroku::Model::App < Struct.new(
     sub_struct_as_hash(:maintenance, :name)
   end
 
-  def identifying
-    Hash[[:maintenance]]
+  def identifiable
+    sub_struct_as_hash(:id, :name)
   end
 end

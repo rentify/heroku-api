@@ -1,5 +1,9 @@
 class Heroku::Model::AppList
 
+  def inspect
+    "#<Heroku::Model::Apps>"
+  end
+
   def initialize(deferred_array)
     @deferred_array = deferred_array
   end

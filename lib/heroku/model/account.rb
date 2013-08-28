@@ -13,9 +13,13 @@ class Heroku::Model::Account < Struct.new(
   :created_at
 )
 
-  include Heroku::Model::HashHelpers
+  include Heroku::Model::ModelHelper
   include Heroku::API::Password
   include Heroku::API::RateLimits
+
+  def inspect
+    "#<#{self.class.name} #{identifier}>"
+  end
 
   def initialize(params = {})
     super(*struct_init_from_hash(params))
@@ -23,6 +27,10 @@ class Heroku::Model::Account < Struct.new(
 
   def patchable
     sub_struct_as_hash(:email, :allow_tracking)
+  end
+
+  def identifiable
+    sub_struct_as_hash(:id, :email)
   end
 
   def save
