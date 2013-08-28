@@ -1,4 +1,3 @@
-require 'json'
 require 'heroku/conn'
 require 'heroku/model/account'
 
@@ -6,11 +5,9 @@ module Heroku::API::Account
   @@etag = nil
 
   def account
-    res    = Heroku::Conn::Get('/account', etag: @@etag)
-    @@etag = res["ETag"]
-    params = JSON.parse(res.body).merge("owner" => self)
-
-    Heroku::Model::Account.new(params)
+    @@etag, res = Heroku::Conn::Get('/account', etag: @@etag)
+    puts @@etag
+    Heroku::Model::Account.new(res.merge("owner" => self))
   end
 
   def update_account(account)

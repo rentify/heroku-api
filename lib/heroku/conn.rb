@@ -1,3 +1,4 @@
+require 'json'
 require 'net/http'
 require 'heroku/config'
 
@@ -32,7 +33,7 @@ private
 
   def self.check_response(key, res)
     case res
-    when Net::HTTPOK          then @response_cache[key] = res
+    when Net::HTTPOK          then @response_cache[key] = [res["ETag"], JSON.parse(res.body)]
     when Net::HTTPNotModified then @response_cache.fetch(key)
     when Net::HTTPSuccess     then res
 
