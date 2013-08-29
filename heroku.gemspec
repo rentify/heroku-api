@@ -4,10 +4,10 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'heroku/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "heroku"
+  spec.name          = "heroku-platform-api"
   spec.version       = Heroku::VERSION
-  spec.authors       = ["Rentify"]
-  spec.email         = ["ashok@rentify.com", "dev@rentify.com"]
+  spec.authors       = ["Ashok Menon", "Rentify"]
+  spec.email         = ["amenon94@gmail.com", "dev@rentify.com"]
   spec.description   = %q{Create, destroy and manage your heroku applications programmatically, using the Heroku Platform API.}
   spec.summary       = %q{Ruby client for the Heroku Platform API.}
   spec.homepage      = ""

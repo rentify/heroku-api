@@ -1,12 +1,12 @@
 # Heroku
 
-TODO: Write a gem description
+Create, destroy and manage your heroku applications programmatically, using the Heroku Platform API.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'heroku'
+    gem 'heroku-platform-api'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install heroku
+    $ gem install heroku-platform-api
 
 ## Usage
 
