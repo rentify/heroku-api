@@ -2,7 +2,6 @@ module Heroku::API::App
   @@etags       = {}
   RESOURCE_TYPE = "APP"
 
-  # TODO: Utilise etag caching after removing method from key in conn.rb
   def app(name_or_id)
     etag, res =
       Heroku::Conn::Get(
@@ -27,7 +26,6 @@ module Heroku::API::App
     Heroku::Model::App.new(res.merge("parent" => self))
   end
 
-  # TODO: Cache here also.
   def update_app(app)
     etag, res =
       Heroku::Conn::Patch(
