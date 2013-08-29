@@ -1,23 +1,44 @@
 module Heroku::API::App
-  @@etags = {}
+  @@etags       = {}
+  RESOURCE_TYPE = "APP"
 
   # TODO: Utilise etag caching after removing method from key in conn.rb
   def app(name_or_id)
-    etag, res          = Heroku::Conn::Get("/apps/#{name_or_id}")
-    @@etags[res['id']] = etag
+    etag, res =
+      Heroku::Conn::Get(
+        "/apps/#{name_or_id}",
+        etag: @@etags[name_or_id],
+        r_type: RESOURCE_TYPE
+      )
+
+    @@etags[res['id']]   = etag
+    @@etags[res['name']] = etag
     Heroku::Model::App.new(res.merge("parent" => self))
   end
 
   def new(params = {})
-    etag, res          = Heroku::Conn::Post('/apps', body: params.to_json)
-    @@etags[res['id']] = etag
+    _, res =
+      Heroku::Conn::Post(
+        '/apps',
+        r_type: RESOURCE_TYPE,
+        body: params.to_json
+      )
+
     Heroku::Model::App.new(res.merge("parent" => self))
   end
 
   # TODO: Cache here also.
   def update_app(app)
-    etag, res = Heroku::Conn::Patch(app.end_point, body: app.patchable.to_json)
-    @@etags[res['id']] = etag
+    etag, res =
+      Heroku::Conn::Patch(
+        app.end_point,
+        etag: @@etags[app.id] || @@etags[app.name],
+        r_type: RESOURCE_TYPE,
+        body: app.patchable.to_json
+      )
+
+    @@etags[res['id']]   = etag
+    @@etags[res['name']] = etag
     Heroku::Model::App.new(res.merge("parent" => self))
   end
 

@@ -1,10 +1,17 @@
 require 'heroku/conn'
 
 module Heroku::API::RateLimits
-  @@etag = nil
+  @@etag        = nil
+  RESOURCE_TYPE = "RATE_LIMITS"
 
   def rate_limits
-    @@etag, res = Heroku::Conn::Get("/account/rate-limits", etag: @@etag)
+    @@etag, res =
+      Heroku::Conn::Get(
+        "/account/rate-limits",
+        etag: @@etag,
+        r_type: RESOURCE_TYPE
+      )
+
     res["remaining"].to_i
   end
 end
