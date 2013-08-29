@@ -1,26 +1,11 @@
+require 'heroku/model'
 require 'heroku/api'
 
-class Heroku::Model::AppList
+class Heroku::Model::AppList < Heroku::Model::ArrayProxy
   include Heroku::API::App
 
   def inspect
     "#<Heroku::Model::Apps>"
-  end
-
-  def initialize(deferred_array)
-    @deferred_array = deferred_array
-  end
-
-  def method_missing(sym, *args)
-    begin
-      proxy_array.send(sym, *args)
-    rescue NoMethodError
-      super
-    end
-  end
-
-  def all
-    proxy_array
   end
 
   def [](key)
@@ -28,11 +13,5 @@ class Heroku::Model::AppList
     when String, Symbol then app(key.to_s)
     else                     super(key)
     end
-  end
-
-private
-
-  def proxy_array
-    @proxy_array ||= @deferred_array.call(self)
   end
 end
