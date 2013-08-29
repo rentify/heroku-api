@@ -1,4 +1,6 @@
-require 'heroku/model'
+require 'heroku/conn'
+require 'heroku/model/app_list'
+require 'heroku/model/app'
 
 module Heroku
   class API

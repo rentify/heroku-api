@@ -1,4 +1,4 @@
-require 'heroku/model'
+require 'heroku/model/model_helper'
 
 module Heroku
   module Model

@@ -1,5 +1,5 @@
-require 'heroku/model'
-require 'heroku/api'
+require 'heroku/api/app'
+require 'heroku/model/array_proxy'
 
 module Heroku
   module Model

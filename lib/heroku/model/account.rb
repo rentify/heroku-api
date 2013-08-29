@@ -1,5 +1,6 @@
-require 'heroku/api'
-require 'heroku/model'
+require 'heroku/api/password'
+require 'heroku/api/rate_limits'
+require 'heroku/model/model_helper'
 
 module Heroku
   module Model
