@@ -23,6 +23,13 @@ class Heroku::Model::AppList
     proxy_array
   end
 
+  def [](key)
+    case key
+    when String, Symbol then app(key.to_s)
+    else                     super(key)
+    end
+  end
+
 private
 
   def proxy_array
