@@ -25,11 +25,11 @@ class Heroku::Conn
     key = "#{method.to_s.upcase} #{end_point}"
 
     case res
-    when Net::HTTPOK             then cache_response(method, end_point, res)
-    when Net::HTTPPartialContent then cache_and_gather_partial_response(method, end_point, res)
-    when Net::HTTPNotModified    then fetch_response(method, end_point)
-    when Net::HTTPSuccess        then res
-    else                              raise_exception(res)
+    when Net::HTTPOK, Net::HTTPCreated then cache_response(method, end_point, res)
+    when Net::HTTPPartialContent       then cache_and_gather_partial_response(method, end_point, res)
+    when Net::HTTPNotModified          then fetch_response(method, end_point)
+    when Net::HTTPSuccess              then res
+    else                                    raise_exception(res)
     end
   end
 

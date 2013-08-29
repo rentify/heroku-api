@@ -36,4 +36,16 @@ class Heroku::Model::App < Struct.new(
   def identifiable
     sub_struct_as_hash(:id, :name)
   end
+
+  def end_point
+    "/apps/#{id}"
+  end
+
+  def save
+    parent.update_app(self)
+  end
+
+  def destroy
+    parent.delete_app(self)
+  end
 end

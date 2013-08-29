@@ -1,4 +1,7 @@
+require 'heroku/api'
+
 class Heroku::Model::AppList
+  include Heroku::API::App
 
   def inspect
     "#<Heroku::Model::Apps>"
