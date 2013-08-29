@@ -2,7 +2,7 @@ require 'heroku/api'
 require 'heroku/model'
 
 class Heroku::Model::Account < Struct.new(
-  :owner,
+  :parent,
   :id,
   :email,
   :verified,
@@ -34,7 +34,7 @@ class Heroku::Model::Account < Struct.new(
   end
 
   def save
-    owner.update_account(self)
+    parent.update_account(self)
   end
 
 end
