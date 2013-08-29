@@ -121,11 +121,10 @@ data as Ruby Arrays and Hashes:
 
 *Raw request for rate limit*
 
-    etag, response = Heroku::Conn::Get('/rate_limits'); response
+    etag, response = Heroku::Conn::Get('/account/rate-limits'); response
     # => { 'remaining' => '1200' }
 
-For further information on the Heroku Platform API, please visit:
-[https://devcenter.heroku.com/articles/platform-api-reference]
+For further information, visit the [Heroku Platform API](https://devcenter.heroku.com/articles/platform-api-reference).
 
 ## Contributing
 
