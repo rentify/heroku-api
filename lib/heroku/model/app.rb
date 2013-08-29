@@ -32,7 +32,12 @@ module Heroku
       end
 
       def push(dir)
-        Git.open(dir).push(git_url)
+        begin
+          Git.open(dir).push(git_url)
+          true
+        rescue
+          false
+        end
       end
 
       def patchable
