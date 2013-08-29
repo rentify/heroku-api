@@ -29,6 +29,10 @@ class Heroku::Model::App < Struct.new(
     super(*struct_init_from_hash(params))
   end
 
+  def push(dir)
+    Git.open(dir).push(git_url)
+  end
+
   def patchable
     sub_struct_as_hash(:maintenance, :name)
   end
