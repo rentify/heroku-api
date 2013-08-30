@@ -9,8 +9,7 @@ module Heroku
     CachePair  = Struct.new(:response, :etag)
 
     @https = Net::HTTP.new('api.heroku.com', 443).tap do |https|
-      https.use_ssl     = true
-      https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      https.use_ssl = true
     end
 
     @response_cache = {}
