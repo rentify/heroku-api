@@ -1,6 +1,6 @@
 require 'json'
 require 'net/http'
-require 'heroku/config'
+require 'heroku/properties'
 
 module Heroku
   class Conn
@@ -99,8 +99,8 @@ module Heroku
       {
         "Accept"        => 'application/vnd.heroku+json; version=3',
         "Content-Type"  => 'application/json',
-        "Authorization" => Heroku::Config.auth_token,
-        "User-Agent"    => Heroku::Config::USER_AGENT
+        "Authorization" => Heroku::Properties.auth_token,
+        "User-Agent"    => Heroku::Properties::USER_AGENT
       }.merge({}.tap do |header|
         header["If-None-Match"] = opts[:etag]  if opts[:etag]
         header["Range"]         = opts[:range] if opts[:range]

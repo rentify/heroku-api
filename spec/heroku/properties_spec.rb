@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Heroku::Config do
+describe Heroku::Properties do
 
   it "should respond to #auth_token" do
     expect(described_class).to respond_to(:auth_token)

@@ -2,7 +2,9 @@ require 'base64'
 require 'heroku/version'
 
 module Heroku
-  class Config
+  class Properties
+    require 'heroku/properties/null_logger'
+
     USER_AGENT = "Heroku Platform API Gem #{Heroku::VERSION}"
 
     def self.auth_token
@@ -15,9 +17,17 @@ module Heroku
       key
     end
 
+    def self.logger
+      @@logger || NullLogger.new
+    end
+
+    def self.logger=(logger)
+      @@logger = logger
+    end
+
     module ConfigMethods
       def configure # yield
-        yield Heroku::Config
+        yield Heroku::Properties
       end
     end
   end

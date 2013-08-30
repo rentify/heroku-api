@@ -1,4 +1,4 @@
-require 'heroku/config'
+require 'heroku/properties'
 
 module Heroku
   class API
@@ -9,7 +9,7 @@ module Heroku
     require 'heroku/api/apps'
     require 'heroku/api/app'
 
-    extend Heroku::Config::ConfigMethods
+    extend Heroku::Properties::ConfigMethods
     extend Heroku::API::Account
     extend Heroku::API::Password
     extend Heroku::API::RateLimits
