@@ -7,7 +7,7 @@ module Heroku
       def debug(  msg); end
       def unknown(msg); end
 
-      def tagged # yields
+      def tagged(tag) # yields
         yield
       end
 

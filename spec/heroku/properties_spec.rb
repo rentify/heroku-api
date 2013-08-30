@@ -14,7 +14,6 @@ describe Heroku::Properties do
       expect(described_class.auth_token).to eq(Base64.encode64(":#{api_key}\n").strip)
     end
 
-
     context "when no api_key is provided" do
       let(:api_key) { nil }
 
@@ -33,5 +32,14 @@ describe Heroku::Properties do
     end
   end
 
+  context "when no logger is provided" do
+    before do
+      described_class.logger = nil
+    end
+
+    it "should provide a null logger" do
+      expect(described_class.logger).not_to be_nil
+    end
+  end
 
 end
