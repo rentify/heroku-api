@@ -31,9 +31,15 @@ module Heroku
     def self.check_response(api_req, r_type, res)
       case res
       when Net::HTTPOK, Net::HTTPCreated then
-        cache.put(r_type, res["ETag"], JSON.parse(res.body))
+        cache.put(
+          r_type, res["ETag"],
+          JSON.parse(res.body)
+        )
       when Net::HTTPPartialContent       then
-        cache.put(r_type, res["ETag"], gather_partial_content(api_req, res))
+        cache.put(
+          r_type, res["ETag"],
+          gather_partial_content(api_req, res)
+        )
       when Net::HTTPNotModified          then cache.fetch(r_type, res)
       when Net::HTTPSuccess              then res
       else                                    raise_exception(res)
