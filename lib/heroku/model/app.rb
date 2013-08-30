@@ -35,7 +35,12 @@ module Heroku
         begin
           Git.open(dir, log: Heroku::Properties.logger).push(git_url)
           true
-        rescue
+        rescue => e
+          Heroku::Properties.logger.error(e.message)
+          e.backtrace.each do |line|
+            Heroku::Properties.logger.error(line)
+          end
+
           false
         end
       end
