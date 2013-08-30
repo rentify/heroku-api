@@ -1,4 +1,5 @@
 require 'heroku/model/model_helper'
+require 'git'
 
 module Heroku
   module Model
