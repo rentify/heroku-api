@@ -6,7 +6,7 @@ module Heroku
       end
 
       def sub_struct_as_hash(*params)
-        Hash[params.map { |k| [k, send(k)] }]
+        Hash[(params & members).map { |k| [k, send(k)] }]
       end
 
       def identifier
