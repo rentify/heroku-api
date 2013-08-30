@@ -18,6 +18,11 @@ Or install it yourself as:
 
 ## Usage
 
+### Require the gem
+
+    require 'heroku_api'
+    # => true
+
 ### Configuration
 
     Heroku::API.configure do |c|
