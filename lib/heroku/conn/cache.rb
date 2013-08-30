@@ -20,8 +20,8 @@ class Heroku::Conn::Cache
     record
   end
 
-  def fetch(r_type, res)
-    pair(r_type).etag[res["ETag"]]
+  def fetch(r_type, etag)
+    pair(r_type).etag[etag]
   end
 
 private
@@ -31,10 +31,6 @@ private
       @response_cache[r_type] ||= {},
       @etag_pointers[r_type]  ||= {}
     ]
-  end
-
-  def update(r_type, json, new_etag)
-
   end
 
   def key(json_response)

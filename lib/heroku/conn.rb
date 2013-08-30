@@ -40,7 +40,7 @@ module Heroku
           r_type, res["ETag"],
           gather_partial_content(api_req, res)
         )
-      when Net::HTTPNotModified          then cache.fetch(r_type, res)
+      when Net::HTTPNotModified          then cache.fetch(r_type, res["ETag"])
       when Net::HTTPSuccess              then res
       else                                    raise_exception(res)
       end
