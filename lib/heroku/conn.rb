@@ -4,16 +4,17 @@ require 'heroku/properties'
 
 module Heroku
   class Conn
+    require 'heroku/conn/cache'
 
     APIRequest = Struct.new(:method, :end_point)
-    CachePair  = Struct.new(:response, :etag)
 
     @https = Net::HTTP.new('api.heroku.com', 443).tap do |https|
       https.use_ssl = true
     end
 
-    @response_cache = {}
-    @etag_pointers  = {}
+    def self.cache
+      @cache ||= Heroku::Conn::Cache.new
+    end
 
     def self.method_missing(method, end_point, opts = {})
       _Request = Net::HTTP.const_get(method.capitalize)
@@ -22,66 +23,33 @@ module Heroku
       req.body = opts[:body]
       api_req  = APIRequest[method, end_point]
 
-      cache_pair = CachePair[
-        @response_cache[opts[:r_type]] ||= {},
-        @etag_pointers[opts[:r_type]]  ||= {}
-      ]
-
-      check_response(api_req, cache_pair, @https.request(req))
+      check_response(api_req, opts[:r_type], @https.request(req))
     end
 
-    private
+  private
 
-    def self.check_response(api_req, cache_pair, res)
+    def self.check_response(api_req, r_type, res)
       case res
-      when Net::HTTPOK, Net::HTTPCreated then cache_response(cache_pair, res)
-      when Net::HTTPPartialContent       then cache_and_gather_partial_response(api_req, cache_pair, res)
-      when Net::HTTPNotModified          then fetch_response(cache_pair, res)
+      when Net::HTTPOK, Net::HTTPCreated then
+        cache.put(r_type, res["ETag"], JSON.parse(res.body))
+      when Net::HTTPPartialContent       then
+        cache.put(r_type, res["ETag"], gather_partial_content(api_req, res))
+      when Net::HTTPNotModified          then cache.fetch(r_type, res)
       when Net::HTTPSuccess              then res
       else                                    raise_exception(res)
       end
     end
 
-    def self.cache_key(json)
-      case json
-      when Array then "list"
-      when Hash  then  json['id']
-      else             nil
-      end
-    end
+    def gather_partial_content(api_req, res)
+      list_head = JSON.parse(res.body)
+      etag, list_tail =
+        self.send(
+          api_req.method,
+          api_req.end_point,
+          range: res["Next-Range"]
+        )
 
-    def self.update_cache_pair(cache_pair, json, new_etag)
-      key          = cache_key(json)
-      old_etag, _  = cache_pair.response[key]
-      cache_record = [new_etag, json]
-
-      cache_pair.etag.delete(old_etag)
-      cache_pair.response[key]  = cache_record
-      cache_pair.etag[new_etag] = cache_record
-    end
-
-    def self.cache_response(cache_pair, res)
-      update_cache_pair(cache_pair, JSON.parse(res.body), res["ETag"])
-    end
-
-    def self.cache_and_gather_partial_response(api_req, cache_pair, res)
-      if res["Next-Range"]
-        list_head       = JSON.parse(res.body)
-        etag, list_tail =
-          self.send(
-            api_req.method,
-            api_req.end_point,
-            range: res["Next-Range"]
-          )
-
-        update_cache_pair(cache_pair, list_tail.unshift(*list_head), etag)
-      else
-        cache_response(cache_pair, old_etag, res)
-      end
-    end
-
-    def self.fetch_response(cache_pair, res)
-      cache_pair.etag[res["ETag"]]
+      list_tail.unshift(*list_head)
     end
 
     def self.raise_exception(res)
