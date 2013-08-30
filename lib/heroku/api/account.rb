@@ -1,4 +1,5 @@
 require 'heroku/conn'
+require 'heroku/properties'
 require 'heroku/model/account'
 
 module Heroku
@@ -8,6 +9,8 @@ module Heroku
       RESOURCE_TYPE = "ACCOUNT"
 
       def account
+        Heroku::Properties.logger.info("[Account] Fetching.")
+
         @@etag, res =
           Heroku::Conn::Get(
             '/account',
@@ -19,6 +22,8 @@ module Heroku
       end
 
       def update_account(account)
+        Heroku::Properties.logger.info("[Account] Updating #{account.id}")
+
         @@etag, res =
           Heroku::Conn::Patch(
             "/account",

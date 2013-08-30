@@ -1,4 +1,4 @@
-require 'json'
+require 'heroku/properties'
 
 class Heroku::Conn::Cache
   CachePair = Struct.new(:response, :etag)
@@ -14,6 +14,9 @@ class Heroku::Conn::Cache
     old_etag, _ = pair.response[key]
     record      = [new_etag, json]
 
+    Heroku::Properties.logger.debug("[#{r_type} Cache] Caching #{key}    #{new_etag}")
+    Heroku::Properties.logger.debug("[#{r_type} Cache] Dissociating tag: #{old_etag}")
+
     pair.etag.delete(old_etag)
     pair.response[key]  = record
     pair.etag[new_etag] = record
@@ -21,6 +24,7 @@ class Heroku::Conn::Cache
   end
 
   def fetch(r_type, etag)
+    Heroku::Properties.logger.info("[#{r_type} Cache] Fetching #{etag}")
     pair(r_type).etag[etag]
   end
 

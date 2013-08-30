@@ -1,4 +1,5 @@
 require 'heroku/conn'
+require 'heroku/properties'
 require 'heroku/model/app'
 
 module Heroku
@@ -8,6 +9,8 @@ module Heroku
       RESOURCE_TYPE = "APP"
 
       def app(name_or_id)
+        Heroku::Properties.logger.info("[App] Fetching #{name_or_id}")
+
         etag, res =
           Heroku::Conn::Get(
             "/apps/#{name_or_id}",
@@ -21,6 +24,8 @@ module Heroku
       end
 
       def new(params = {})
+        Heroku::Properties.logger.info("[App] New with parameters: #{params.inspect}")
+
         _, res =
           Heroku::Conn::Post(
             '/apps',
@@ -32,6 +37,8 @@ module Heroku
       end
 
       def update_app(app)
+        Heroku::Properties.logger.info("[App] Updating #{app.id}")
+
         etag, res =
           Heroku::Conn::Patch(
             app.end_point,
@@ -45,7 +52,8 @@ module Heroku
       end
 
       def delete_app(app)
-        Heroku::Conn::Delete(app.end_point)
+        Heroku::Properties.logger.info("[App] Deleting #{app.id}")
+        Heroku::Conn::Delete(app.end_point, r_type: RESOURCE_TYPE)
         true
       end
     end

@@ -5,7 +5,9 @@ module Heroku
   class Properties
     require 'heroku/properties/null_logger'
 
-    USER_AGENT = "Heroku Platform API Gem #{Heroku::VERSION}"
+    USER_AGENT   = "Heroku Platform API Gem #{Heroku::VERSION}"
+    @@auth_token = nil
+    @@logger     = nil
 
     def self.auth_token
       @@auth_token

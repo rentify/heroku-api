@@ -33,7 +33,7 @@ module Heroku
 
       def push(dir)
         begin
-          Git.open(dir).push(git_url)
+          Git.open(dir, log: Heroku::Properties.logger).push(git_url)
           true
         rescue
           false

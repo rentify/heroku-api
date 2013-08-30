@@ -26,7 +26,8 @@ Or install it yourself as:
 ### Configuration
 
     Heroku::API.configure do |c|
-      c.api_key = "<Heroku API token>"
+      c.api_key = "<Heroku API token>" # Mandatory
+      c.logger  = Logger.new($stdout)  # Optional
     end
 
 ### Apps

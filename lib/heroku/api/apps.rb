@@ -1,4 +1,5 @@
 require 'heroku/conn'
+require 'heroku/properties'
 require 'heroku/model/app_list'
 require 'heroku/model/app'
 
@@ -10,6 +11,8 @@ module Heroku
 
       def apps
         Heroku::Model::AppList.new( ->(parent){
+          Heroku::Properties.logger.info("[Apps] Fetching")
+
           @@etag, res =
             Heroku::Conn::Get(
               "/apps",

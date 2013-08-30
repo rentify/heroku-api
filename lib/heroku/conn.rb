@@ -23,30 +23,37 @@ module Heroku
       req.body = opts[:body]
       api_req  = APIRequest[method, end_point]
 
+      Heroku::Properties.logger.debug("[Conn] Attempting #{method.upcase} #{end_point} ...")
+
       check_response(api_req, opts[:r_type], @https.request(req))
     end
 
   private
 
     def self.check_response(api_req, r_type, res)
+      Heroku::Properties.logger.debug("[Conn] Received #{res.code} for #{r_type} at #{api_req.end_point}")
+
       case res
-      when Net::HTTPOK, Net::HTTPCreated then
+      when Net::HTTPOK,
+           Net::HTTPCreated
         cache.put(
           r_type, res["ETag"],
           JSON.parse(res.body)
         )
-      when Net::HTTPPartialContent       then
+      when Net::HTTPPartialContent
         cache.put(
           r_type, res["ETag"],
           gather_partial_content(api_req, res)
         )
-      when Net::HTTPNotModified          then cache.fetch(r_type, res["ETag"])
-      when Net::HTTPSuccess              then res
-      else                                    raise_exception(res)
+      when Net::HTTPNotModified then cache.fetch(r_type, res["ETag"])
+      when Net::HTTPSuccess     then [res["ETag"], JSON.parse(res.body)]
+      else                           raise_exception(res)
       end
     end
 
     def gather_partial_content(api_req, res)
+      Heroku::Properties.logger.info("[Conn] Gathering Partial Content.")
+
       list_head = JSON.parse(res.body)
       etag, list_tail =
         self.send(
@@ -59,6 +66,7 @@ module Heroku
     end
 
     def self.raise_exception(res)
+      Heroku::Properties.logger.error("[Conn] Uh oh, something went wrong with request #{res["Request-Id"]}.")
       raise res.class::EXCEPTION_TYPE.new(status(res.code), nil)
     end
 
