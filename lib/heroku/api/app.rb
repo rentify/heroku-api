@@ -35,7 +35,6 @@ module Heroku
         etag, res =
           Heroku::Conn::Patch(
             app.end_point,
-            etag: @@etags[app.id] || @@etags[app.name],
             r_type: RESOURCE_TYPE,
             body: app.patchable.to_json
           )
