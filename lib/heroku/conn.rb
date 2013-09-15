@@ -66,6 +66,7 @@ module Heroku
     end
 
     def self.raise_exception(res)
+      Heroku::Properties.logger.error("[Conn response] #{res.body.inspect}")
       Heroku::Properties.logger.error("[Conn] Uh oh, something went wrong with request #{res["Request-Id"]}.")
       raise res.class::EXCEPTION_TYPE.new(status(res.code), nil)
     end
