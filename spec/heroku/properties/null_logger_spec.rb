@@ -14,7 +14,7 @@ describe Heroku::Properties::NullLogger do
 
     it { should respond_to(:tagged).with(1).argument }
     it "calls the block provided to it" do
-      block_check.should_receive(:call).once
+      expect(block_check).to receive(:call).once
 
       subject.tagged("tag") do
         block_check.call
