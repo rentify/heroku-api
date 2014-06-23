@@ -90,19 +90,21 @@ module Heroku
     end
 
     def self.parse_body(res)
-      JSON.parse(
-        case res["content-encoding"]
-        when 'gzip'
-          Zlib::GzipReader.new(
-            StringIO.new(res.body),
-            encoding: "ASCII-8BIT"
-          ).read
-        when 'deflate'
-          Zlib::Inflate.inflate(res.body)
-        else
-          res.body
-        end
-      )
+      JSON.parse(decompress(res))
+    end
+
+    def self.decompress(res)
+      case res["content-encoding"]
+      when 'gzip'
+        Zlib::GzipReader.new(
+          StringIO.new(res.body),
+          encoding: "ASCII-8BIT"
+        ).read
+      when 'deflate'
+        Zlib::Inflate.inflate(res.body)
+      else
+        res.body
+      end
     end
   end
 end

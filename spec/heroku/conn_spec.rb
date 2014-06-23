@@ -11,16 +11,10 @@ describe Heroku::Conn do
     end
   end
 
-  describe ".parse_body" do
+  describe "Parsing" do
     let(:hash) { {"lorem" => "ipsum dolor sit amet"} }
     let(:body) { hash.to_json }
     let(:res)  { double(:res) }
-
-    def self.it_returns_the_hash
-      it "returns the hash" do
-        expect(described_class.send(:parse_body, res)).to eq(hash)
-      end
-    end
 
     def set_body(res, body)
       allow(res).to receive(:body).and_return(body)
@@ -32,34 +26,60 @@ describe Heroku::Conn do
         .and_return(enc)
     end
 
-    context "when the body is not encoded" do
+    describe ".parse_body" do
       before do
-        set_encoding(res, "identity")
+        set_encoding(res, nil)
         set_body(res, body)
       end
 
-      it_returns_the_hash
-    end
-
-    context "when the body is deflated" do
-      before do
-        set_encoding(res, "deflate")
-        set_body(res, Zlib::Deflate.deflate(body))
+      it "attempts to decompress the body" do
+        expect(described_class).to receive(:decompress)
+          .with(res)
+          .and_call_original
+        described_class.send(:parse_body, res)
       end
 
-      it_returns_the_hash
+      it "converts the body to json" do
+        expect(described_class.send(:parse_body, res)).to eq(hash)
+      end
     end
 
-    context "when the body is gzipped" do
-      before do
-        set_encoding(res, "gzip")
-
-        strio = StringIO.new
-        Zlib::GzipWriter.wrap(strio) { |gz| gz.write(body) }
-        set_body(res, strio.string)
+    describe ".decompress" do
+      def self.it_returns_the_body
+        it "returns the body" do
+          expect(described_class.send(:decompress, res)).to eq(body)
+        end
       end
 
-      it_returns_the_hash
+      context "when the body is not encoded" do
+        before do
+          set_encoding(res, "identity")
+          set_body(res, body)
+        end
+
+        it_returns_the_body
+      end
+
+      context "when the body is deflated" do
+        before do
+          set_encoding(res, "deflate")
+          set_body(res, Zlib::Deflate.deflate(body))
+        end
+
+        it_returns_the_body
+      end
+
+      context "when the body is gzipped" do
+        before do
+          set_encoding(res, "gzip")
+
+          strio = StringIO.new
+          Zlib::GzipWriter.wrap(strio) { |gz| gz.write(body) }
+          set_body(res, strio.string)
+        end
+
+        it_returns_the_body
+      end
     end
   end
 end
