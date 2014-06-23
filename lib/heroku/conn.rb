@@ -38,7 +38,7 @@ module Heroku
            Net::HTTPCreated
         cache.put(
           r_type, res["ETag"],
-          JSON.parse(res.body)
+          parse_body(res)
         )
       when Net::HTTPPartialContent
         cache.put(
@@ -46,7 +46,7 @@ module Heroku
           gather_partial_content(api_req, res)
         )
       when Net::HTTPNotModified then cache.fetch(r_type, res["ETag"])
-      when Net::HTTPSuccess     then [res["ETag"], JSON.parse(res.body)]
+      when Net::HTTPSuccess     then [res["ETag"], parse_body(res)]
       else                           raise_exception(res)
       end
     end
@@ -54,7 +54,7 @@ module Heroku
     def gather_partial_content(api_req, res)
       Heroku::Properties.logger.info("[Conn] Gathering Partial Content.")
 
-      list_head = JSON.parse(res.body)
+      list_head = parse_body(res)
       etag, list_tail =
         self.send(
           api_req.method,
@@ -80,13 +80,29 @@ module Heroku
     def self.headers(opts = {})
       {
         "Accept"        => 'application/vnd.heroku+json; version=3',
-        "Content-Type"  => 'application/json',
+        "Content-Type"  => 'application/json;charset=utf-8',
         "Authorization" => Heroku::Properties.auth_token,
         "User-Agent"    => Heroku::Properties::USER_AGENT
       }.merge({}.tap do |header|
         header["If-None-Match"] = opts[:etag]  if opts[:etag]
         header["Range"]         = opts[:range] if opts[:range]
       end)
+    end
+
+    def self.parse_body(res)
+      JSON.parse(
+        case res["content-encoding"]
+        when 'gzip'
+          Zlib::GzipReader.new(
+            StringIO.new(res.body),
+            encoding: "ASCII-8BIT"
+          ).read
+        when 'deflate'
+          Zlib::Inflate.inflate(res.body)
+        else
+          res.body
+        end
+      )
     end
   end
 end
