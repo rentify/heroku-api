@@ -53,18 +53,33 @@ describe Heroku::Model::ModelHelper do
 
   describe "#identifier" do
     context "when there are no identifiable parameters" do
-      before { subject.should_receive(:identifiable).and_return({}) }
-      its(:identifier) { should == "" }
+      before do
+        expect(subject).to receive(:identifiable).and_return({})
+      end
+
+      it "should return an empty identifier" do
+        expect(subject.identifier).to be_empty
+      end
     end
 
     context "when the identifier is one parameter" do
-      before { subject.should_receive(:identifiable).and_return({ a: 1 }) }
-      its(:identifier) { should == "a=1" }
+      before do
+        expect(subject).to receive(:identifiable).and_return({ a: 1 })
+      end
+
+      it "should appear in the identifier" do
+        expect(subject.identifier).to eq "a=1"
+      end
     end
 
     context "when the identifier contains multiple parameters" do
-      before { subject.should_receive(:identifiable).and_return({ a: 1, b: 2}) }
-      its(:identifier) { should == "a=1, b=2" }
+      before do
+        expect(subject).to receive(:identifiable).and_return({ a: 1, b: 2})
+      end
+
+      it "should return a comma separated list" do
+        expect(subject.identifier).to eq "a=1, b=2"
+      end
     end
   end
 end
