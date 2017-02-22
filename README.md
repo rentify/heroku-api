@@ -1,3 +1,9 @@
+# This gem is no longer maintained
+
+Please use the official [Heroku platform-api](https://github.com/heroku/platform-api) gem
+
+---
+
 # Heroku
 
 Create, destroy and manage your heroku applications programmatically, using the Heroku Platform API.
